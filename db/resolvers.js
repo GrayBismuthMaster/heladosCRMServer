@@ -225,8 +225,16 @@ const resolvers = {
                 throw new Error('El password es Incorrecto');
             }
             //Generar token
+            console.log("usuario de existe")
+            console.log(existeUsuario);
+            const user = {
+                id: existeUsuario._id,
+                nombre: existeUsuario.nombre,
+                email: existeUsuario.email,
+            }
             return {
-                token: crearToken(existeUsuario,process.env.SECRETA, '24h')
+                token: crearToken(existeUsuario,process.env.SECRETA, '168h'),
+                user
             }
         },
         nuevoProducto: async(_,{input}) =>{
@@ -356,13 +364,20 @@ const resolvers = {
             }
             console.log('después del error ....');
             //Crear un nuevo pedido
-            const nuevoPedido = new Pedido(input);
-            //Asignarle un vendedor
-            nuevoPedido.vendedor = ctx.usuario.id;
-            //Guardarlo en la base de datos 
-            const resultado = await nuevoPedido.save();
-            return resultado;
+            try{
+                const nuevoPedido = new Pedido(input);            
+                //Asignarle un vendedor
+                nuevoPedido.vendedor = ctx.usuario.id;
+                //Guardarlo en la base de datos 
+                const resultado = await nuevoPedido.save();
+                
+                return resultado;
 
+            }
+            catch(error) {
+                console.log(error)
+            }
+            
         },
         actualizarPedido : async (_,{id,input},ctx) => {
             try {
