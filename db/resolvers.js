@@ -227,14 +227,13 @@ const resolvers = {
             //Generar token
             console.log("usuario de existe")
             console.log(existeUsuario);
-            const user = {
-                id: existeUsuario._id,
-                nombre: existeUsuario.nombre,
-                email: existeUsuario.email,
-            }
+            // const user = {
+            //     id: existeUsuario._id,
+            //     nombre: existeUsuario.nombre,
+            //     email: existeUsuario.email,
+            // }
             return {
-                token: crearToken(existeUsuario,process.env.SECRETA, '168h'),
-                user
+                token: crearToken(existeUsuario,process.env.SECRETA, '7d')
             }
         },
         nuevoProducto: async(_,{input}) =>{

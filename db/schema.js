@@ -4,9 +4,13 @@ const {gql} = require('apollo-server')
 const typeDefs = gql `
     
     type Token {
-        token: String 
+        token: String,
     }
-
+    type UsuarioAutenticado {
+        id : ID,
+        nombre : String,
+        email : String
+    }
     input UsuarioInput {
         nombre: String
         apellido: String!
@@ -60,6 +64,7 @@ const typeDefs = gql `
         nombre: String
         existencia: Int
         precio:Float
+        imagen : String
         creado: String
     }
     type Cliente {

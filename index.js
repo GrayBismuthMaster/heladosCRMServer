@@ -5,7 +5,17 @@ require('dotenv').config({path:'Variables.env'});
 const typeDefs = require('./db/schema')
 const resolvers = require('./db/resolvers')
 const conectarDB = require('./config/db')
+const {
 
+    GraphQLUpload,
+  
+    graphqlUploadExpress, // A Koa implementation is also exported.
+  
+  } = require('graphql-upload');
+  
+//Roles
+const createRoles= require('./libs/initialSetup');
+createRoles();
 //Conectar a la base de datos
 conectarDB();
 //Servidor 

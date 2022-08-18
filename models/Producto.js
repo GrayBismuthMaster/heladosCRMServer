@@ -15,6 +15,11 @@ const ProductosSchema = mongoose.Schema({
         required: true,
         trim:true
     },
+    imagen : {
+        type : String,
+        required : true
+    }
+    ,
     creado: {
         type: Date,
         default: Date.now()
