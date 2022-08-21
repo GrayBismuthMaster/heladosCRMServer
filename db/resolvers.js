@@ -1,14 +1,18 @@
 //Importamos los modelos  
-const Usuario = require('../models/Usuario');
-const Producto = require('../models/Producto')
-const Cliente  = require('../models/Cliente')
-const Pedido = require('../models/Pedido')
+import Usuario from '../models/Usuario.js';
+import Producto from '../models/Producto.js'
+import Cliente  from '../models/Cliente.js'
+import Pedido from '../models/Pedido.js'
 //Importamos el crypt para hashear las passwords
-const bcryptjs = require('bcryptjs');
+import bcryptjs from 'bcryptjs';
 //Importamos el jwt para los tokens
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 //Importamos el path con la variable de entorno de la palabraSecreta para el token
-require('dotenv').config({path:'variables.env'});
+import dotenv from 'dotenv';
+dotenv.config({path:'Variables.env'});
+//SUBSCRIPTIONS PSEUDO CHAT
+import { PubSub } from 'graphql-subscriptions';
+import { Message } from '../fakeDb.js';
 //Resolvers
 //Los resolvers son objetos
 //En los resolvers se leen los input
@@ -20,6 +24,19 @@ const crearToken = (usuario,secreta,expiresIn) => {
     //que se agregara en la cabecera del jsonWebToken
     return jwt.sign({id,email,nombre,apellido},secreta,{expiresIn})
 }
+
+//PSEUDO CHAT PARANOTIFICACIONES
+
+const pubSub = new PubSub();
+
+function rejectIf(condition) {
+  if (condition) {
+    throw new Error('Unauthorized');
+  }
+}
+
+
+
 const resolvers = {
     Query:{
         obtenerUsuario: async (_,{},ctx) => {
@@ -55,6 +72,7 @@ const resolvers = {
             }
         },
         obtenerClientesVendedor: async(_,{},ctx)=>{
+            console.log("cobtexti : ", ctx);
             try {
                 const clientes = await Cliente.find({vendedor:ctx.usuario.id})    
                 return clientes
@@ -187,6 +205,14 @@ const resolvers = {
         buscarProducto: async (_,{texto},ctx)=>{
             const productos = await Producto.find({ $text : { $search: texto}})
             return productos;
+        },
+        //MENSAJE DESDE EL CLIENTE AL SERVIDOR
+        messages: (_root, _args,  {usuario:{id}}) => {
+            console.log("Entra a messages")
+            console.log("Id de entra a messages", id);
+            rejectIf(!id);
+            console.log(Message.findAll());
+            return Message.findAll();
         }
     },
     Mutation: {
@@ -434,8 +460,29 @@ const resolvers = {
             //Eliminar de la base de datos
             await Pedido.findOneAndDelete({_id:id});
             return "Pedido eliminado";
-        }
+        },
+        //MENSAJE DEL PSEUDO CAHT PARA LASN OTIFICACIONES
+        addMessage: async (_root, { input:{text} }, {usuario:{id}}) => {
+            console.log(text)
+            console.log(id)
+          rejectIf(!id);
+          const message = await Message.create({ from: id, text });
+        //   const message = {id: Date.now(), from: id, text };
+        //   pubSub.publish('MESSAGE_ADDED', { messageAdded: {from : id, text} });
+          pubSub.publish('MESSAGE_ADDED', { messageAdded: message });
+
+          return message;
+        },  
         
-    }
+    }, Subscription: {
+        messageAdded: {
+          subscribe: (_root, _args, {usuario}) => {
+            // console.log("entro al subscription", id);
+            // rejectIf(!usuario);
+            console.log("se va al pub asyncIterator")
+            return pubSub.asyncIterator('MESSAGE_ADDED');
+          },
+        },
+      },
 }
-module.exports = resolvers;
+export default resolvers

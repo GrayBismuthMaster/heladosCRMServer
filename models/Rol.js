@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 const rolSchema = new mongoose.Schema({
     nombreRol : String
 },{
     versionKey: false
 });
-
-module.exports = mongoose.model('Rol',rolSchema)
+const Rol = mongoose.model('Rol',rolSchema)
+export default Rol;

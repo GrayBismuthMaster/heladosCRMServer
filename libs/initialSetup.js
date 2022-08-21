@@ -1,4 +1,4 @@
-const Rol = require('../models/Rol');
+import Rol from '../models/Rol.js';
 const createRoles = async ()=>{
     try {
         const count = await Rol.estimatedDocumentCount();
@@ -14,4 +14,4 @@ const createRoles = async ()=>{
     }
     
 }
-module.exports = createRoles
+export default createRoles

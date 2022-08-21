@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 const ProductosSchema = mongoose.Schema({
     nombre: {
         type: String,
@@ -17,7 +17,7 @@ const ProductosSchema = mongoose.Schema({
     },
     imagen : {
         type : String,
-        required : true
+        required : false
     }
     ,
     creado: {
@@ -27,4 +27,5 @@ const ProductosSchema = mongoose.Schema({
 });
 //Agregamos el index en el modelo 
 ProductosSchema.index({nombre: "text"});
-module.exports =mongoose.model('Producto', ProductosSchema);
+const Producto = mongoose.model('Producto', ProductosSchema);
+export default Producto;

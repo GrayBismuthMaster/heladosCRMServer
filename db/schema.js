@@ -1,8 +1,21 @@
-const {gql} = require('apollo-server')
+import {gql} from 'apollo-server';
 
 //Schema
 const typeDefs = gql `
     
+    type Message {
+        id: ID!
+        from: String!
+        text: String!
+    }
+
+    input MessageInput {
+        text: String!
+    }
+
+
+
+
     type Token {
         token: String,
     }
@@ -119,6 +132,9 @@ const typeDefs = gql `
             mejoresClientes: [TopCliente]
             mejoresVendedores: [TopVendedor]
             buscarProducto(texto : String!): [Producto]
+
+            #PSEUDO CHAT PARA NOTIFICACIONES
+            messages: [Message!]
         }
     type Mutation {
         #Productos
@@ -139,7 +155,13 @@ const typeDefs = gql `
         nuevoPedido(input: PedidoInput): Pedido
         actualizarPedido(id:ID!, input: PedidoInput) : Pedido
         eliminarPedido(id:ID!):String
+
+        #PSEUDO CHAT PARA NOTIFICACIONES
+        addMessage(input: MessageInput!): Message
+    }
+    type Subscription {
+        messageAdded: Message
     }
 `;
 //Importar node
-module.exports = typeDefs;
+export default typeDefs;
