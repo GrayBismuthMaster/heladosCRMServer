@@ -135,6 +135,7 @@ const typeDefs = gql `
 
             #PSEUDO CHAT PARA NOTIFICACIONES
             messages: [Message!]
+            message: Message
         }
     type Mutation {
         #Productos

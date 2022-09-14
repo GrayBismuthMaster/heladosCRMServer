@@ -211,9 +211,10 @@ const resolvers = {
             console.log("Entra a messages")
             console.log("Id de entra a messages", id);
             rejectIf(!id);
-            console.log(Message.findAll());
+            // let mensajes = Message.findAll();
+            // console.log("mensajes del json", mensajes);
             return Message.findAll();
-        }
+        },
     },
     Mutation: {
         nuevoUsuario: async (_,{input} ) => {
@@ -479,6 +480,22 @@ const resolvers = {
           subscribe: (_root, _args, {usuario}) => {
             // console.log("entro al subscription", id);
             // rejectIf(!usuario);
+            let mensaje = Message.findAll();
+            
+            mensaje.then((messages)=>{
+                let numTotalMensajes = messages.length;
+                let cont=0;
+                messages.map((message)=>{
+                    if(cont<numTotalMensajes-10){
+                        Message.delete(message.id);
+                    }
+                    else{
+                        return;
+                    }
+                        
+                })
+                // Message.delete(message.id);
+            })
             console.log("se va al pub asyncIterator")
             return pubSub.asyncIterator('MESSAGE_ADDED');
           },
