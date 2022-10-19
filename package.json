@@ -1,5 +1,5 @@
 {
-  "name": "crmgraphql",
+  "name": "heladoscrmserver",
   "version": "1.0.0",
   "description": "Repasos de GraphQL y creación de crm",
   "main": "index.js",
