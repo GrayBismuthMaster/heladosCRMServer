@@ -18,6 +18,11 @@ const PedidosSchema = mongoose.Schema({
        required:true,
        ref:'Usuario'
    },
+   aportes : [{
+        type : mongoose.Schema.Types.ObjectId,
+        required : false,
+        ref: 'Aporte'
+   }],
    estado: {
        type:String,
        default: "PENDIENTE"

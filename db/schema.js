@@ -13,9 +13,6 @@ const typeDefs = gql `
         text: String!
     }
 
-
-
-
     type Token {
         token: String,
     }
@@ -51,11 +48,16 @@ const typeDefs = gql `
     input PedidoProductoInput {
         id:ID
         cantidad: Int
-        nombre : String
-        precio : Float
+        nombre: String
+        precio: Float
+    }
+    input AporteInput {
+        valor: Float
+        pedido: ID
     }
     input PedidoInput {
         pedido: [PedidoProductoInput]
+        aportes: [AporteInput]
         total: Float
         cliente: ID
         estado: EstadoPedido
@@ -77,7 +79,7 @@ const typeDefs = gql `
         nombre: String
         existencia: Int
         precio:Float
-        imagen : String
+        imagen: String
         creado: String
     }
     type Cliente {
@@ -89,20 +91,27 @@ const typeDefs = gql `
         telefono:String
         vendedor: ID
     }
+    type Aporte {
+        id: ID
+        valor: Float 
+        creado: String
+        pedido: ID
+    }
     type Pedido {
         id: ID!
         pedido: [PedidoGrupo]
         total: Float
         cliente: Cliente
         vendedor: ID
+        aportes: [Aporte]
         fecha: String
         estado: EstadoPedido
     }
     type PedidoGrupo{
         id:ID
         cantidad: Int
-        nombre : String
-        precio : Float
+        nombre: String
+        precio: Float
     }
     type TopCliente{
         total: Float
@@ -110,7 +119,7 @@ const typeDefs = gql `
     }
     type TopVendedor{
         total: Float
-        vendedor : [Usuario]
+        vendedor: [Usuario]
     }
     type Query {
             #Productos
@@ -131,7 +140,7 @@ const typeDefs = gql `
             #Busquedas Avanzadas
             mejoresClientes: [TopCliente]
             mejoresVendedores: [TopVendedor]
-            buscarProducto(texto : String!): [Producto]
+            buscarProducto(texto: String!): [Producto]
 
             #PSEUDO CHAT PARA NOTIFICACIONES
             messages: [Message!]

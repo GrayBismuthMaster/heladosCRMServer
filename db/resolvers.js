@@ -3,6 +3,7 @@ import Usuario from '../models/Usuario.js';
 import Producto from '../models/Producto.js'
 import Cliente  from '../models/Cliente.js'
 import Pedido from '../models/Pedido.js'
+import Aporte from '../models/Aporte.js'
 //Importamos el crypt para hashear las passwords
 import bcryptjs from 'bcryptjs';
 //Importamos el jwt para los tokens
@@ -13,6 +14,7 @@ dotenv.config({path:'Variables.env'});
 //SUBSCRIPTIONS PSEUDO CHAT
 import { PubSub } from 'graphql-subscriptions';
 import { Message } from '../fakeDb.js';
+import mongoose from 'mongoose';
 //Resolvers
 //Los resolvers son objetos
 //En los resolvers se leen los input
@@ -101,7 +103,7 @@ const resolvers = {
         },
         obtenerPedidos: async() => {
             try {
-                const pedidos = await Pedido.find({});
+                const pedidos = await Pedido.                                                                                            find({});
                 return pedidos;
             } catch (error) {
                 console.log(error);
@@ -111,7 +113,7 @@ const resolvers = {
             try {
                 const pedidos = await Pedido.find({vendedor: ctx.usuario.id}).populate('cliente', {
                     
-                });
+                }).populate(('aportes'));
                 console.log(pedidos);
                 return pedidos;
             } catch (error) {
@@ -361,6 +363,7 @@ const resolvers = {
             await Cliente.findByIdAndDelete({_id:id})
             return "Cliente eliminado"
         },
+        
         nuevoPedido: async (_,{input},ctx)=> {
             const {cliente} =input
             //Verificar si el cliente existe o no
@@ -385,7 +388,6 @@ const resolvers = {
                 {
                     throw new Error(`EL artículo ${producto.nombre} excede la cantidad disponible`);
                 }
-
             }
             console.log('después del error ....');
             //Crear un nuevo pedido
@@ -395,22 +397,19 @@ const resolvers = {
                 nuevoPedido.vendedor = ctx.usuario.id;
                 //Guardarlo en la base de datos 
                 const resultado = await nuevoPedido.save();
-                
                 return resultado;
-
             }
             catch(error) {
                 console.log(error)
             }
-            
         },
         actualizarPedido : async (_,{id,input},ctx) => {
             try {
                 //Deestructuramos el input
-                const {cliente} = input;
+                const {cliente, aportes} = input;
                 console.log('INput desde el estado')
-                console.log(input);
-                //Verificar si el pedido existe
+                console.log(input, aportes);
+                //Verificar si el pedido existe 
                 const existePedido =await Pedido.findById(id)
                 if(!existePedido){
                     throw new Error("El pedido no existe");
@@ -426,20 +425,28 @@ const resolvers = {
                 {
                     throw new Error("No tienes las credenciales necesarias")
                 }
-                //Revisar el stock
-                
-                // for await ( const articulo of input.pedido) {
-                //     const { id } = articulo;
-                //     const producto = await Producto.findById(id);
-                //     if(articulo.cantidad > producto.existencia){
-                //         throw new Error(`El articulo: ${producto.nombre} excede la cantidad disponible`);
-                //     } else{
-                //         producto.existencia = producto.existencia - articulo.cantidad;
-                //         await producto.save();
-                //     }
-                // }
-
                 //Guardar el pedido
+                
+                if(aportes.length>0){
+                    console.log('input dentro del condicional',input.aportes)
+                    const nuevoAporte = new Aporte({valor:input.aportes[0].valor, pedido : 
+                        mongoose.Types.ObjectId(id)}); 
+                    //Guardarlo en la base de datos 
+                    await nuevoAporte.save();
+                         
+                    const aportesDB = await Aporte.find({pedido:id});
+                    //Ingreso de aportes en el pedido
+                    let idAportes = [];
+                    idAportes =await aportesDB.map(aporteDB => {return aporteDB._id});
+                    console.log("aportes de id", idAportes);
+                    const inputAporte = {
+                        aportes : idAportes
+                    }
+                    await Pedido.findOneAndUpdate({_id:id},inputAporte, {new:true})
+                    let pedidoActualizado = await Pedido.findById(id).populate("aportes");
+                    console.log(pedidoActualizado);
+                    return pedidoActualizado;
+                }
                 const resultado = await Pedido.findOneAndUpdate({_id:id},input, {new:true}) 
                 return resultado;
             } catch (error) {
