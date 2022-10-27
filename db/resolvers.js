@@ -439,13 +439,34 @@ const resolvers = {
                     let idAportes = [];
                     idAportes =await aportesDB.map(aporteDB => {return aporteDB._id});
                     console.log("aportes de id", idAportes);
-                    const inputAporte = {
-                        aportes : idAportes
+                    //ACUM DE VALORES DE APORTES 
+                    let acumAportes = await aportesDB.map(aporteDB=>{return aporteDB.valor})
+                    let acumValores = acumAportes.reduce((a,b)=> a+b,0)
+                    console.log('Valores de aportes', acumValores);
+                    //CONDICIONAL DE < 0
+                    if(existePedido.total - acumValores < 0){    
+                        const inputAporte = {
+                            aportes : idAportes,
+                        }
+                        await Pedido.findOneAndUpdate({_id:id},inputAporte, {new:true})
+                        let pedidoActualizado = await Pedido.findById(id).populate("aportes");
+                        console.log(pedidoActualizado);
+                        //ACTUALIZAR SALDO DE LA BASE DE DATOS 
+                        
+                        return pedidoActualizado;
+                    }else{
+                        const inputAporte = {
+                            aportes : idAportes,
+                            saldo : existePedido.total - acumValores
+                        }
+                        await Pedido.findOneAndUpdate({_id:id},inputAporte, {new:true})
+                        let pedidoActualizado = await Pedido.findById(id).populate("aportes");
+                        console.log(pedidoActualizado);
+                        //ACTUALIZAR SALDO DE LA BASE DE DATOS 
+                        
+                        return pedidoActualizado;
                     }
-                    await Pedido.findOneAndUpdate({_id:id},inputAporte, {new:true})
-                    let pedidoActualizado = await Pedido.findById(id).populate("aportes");
-                    console.log(pedidoActualizado);
-                    return pedidoActualizado;
+                    
                 }
                 const resultado = await Pedido.findOneAndUpdate({_id:id},input, {new:true}) 
                 return resultado;

@@ -23,6 +23,10 @@ const PedidosSchema = mongoose.Schema({
         required : false,
         ref: 'Aporte'
    }],
+   saldo : {
+        type: Number,
+        required : false
+   },
    estado: {
        type:String,
        default: "PENDIENTE"

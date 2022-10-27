@@ -105,6 +105,7 @@ const typeDefs = gql `
         vendedor: ID
         aportes: [Aporte]
         fecha: String
+        saldo: Float
         estado: EstadoPedido
     }
     type PedidoGrupo{
