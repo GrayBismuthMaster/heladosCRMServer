@@ -52,8 +52,13 @@ const PORT = 9000;
 
 
 const app = express();
-
-app.use(cors(), express.json(), expressjwt({
+const corsOptions = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Credentials": true,
+  'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE, PATCH, OPTIONS',
+  "Access-Control-Allow-Headers": 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json'
+};
+app.use(  cors(corsOptions),express.json(), expressjwt({
   algorithms: ['HS256'],
   credentialsRequired: false,
   secret : process.env.SECRETA,
@@ -62,10 +67,11 @@ app.use(cors(), express.json(), expressjwt({
 }));
 
 app.post('/login', async (req, res) => {
-    console.log("Loging")
+    console.log("Loging");    
     const { email, password } = req.body;
     const existeUsuario = await Usuario.findOne({email})
     if(!existeUsuario){
+	
         throw new Error('El usuario no existe')
     }
 
@@ -122,31 +128,3 @@ await httpServer.listen({ port: PORT }, () => {
   console.log(`GraphQL endpoint: http://localhost:${PORT}/graphql`);
 });
 
-
-
-// const server = new ApolloServer({
-//     typeDefs,
-//     resolvers,
-//     //El context funciona en todos los resolvers
-//     context: ({req}) =>{
-//         console.log(req.headers)
-//         const token = req.headers['authorization'] || '';
-//         if(token){
-//             try {
-//                 const usuario = jwt.verify(token.replace('Bearer ',''),process.env.SECRETA)
-//                 //console.log(usuario)
-//                 return {
-//                     usuario
-//                 }
-//             } catch (error) {
-//                 console.log(error)
-//             }
-//         }
-//     }
-// })
- 
-//Arrancar el servidor
-//El then har'a un promise
-// server.listen().then(({url})=>{
-//     console.log(`Servidor listo en la URL ${url}`)
-// })
