@@ -426,49 +426,62 @@ const resolvers = {
                     throw new Error("No tienes las credenciales necesarias")
                 }
                 //Guardar el pedido
-                
-                if(aportes.length>0){
-                    console.log('input dentro del condicional',input.aportes)
-                    const nuevoAporte = new Aporte({valor:input.aportes[0].valor, pedido : 
-                        mongoose.Types.ObjectId(id)}); 
-                    //Guardarlo en la base de datos 
-                    await nuevoAporte.save();
-                         
-                    const aportesDB = await Aporte.find({pedido:id});
-                    //Ingreso de aportes en el pedido
-                    let idAportes = [];
-                    idAportes =await aportesDB.map(aporteDB => {return aporteDB._id});
-                    console.log("aportes de id", idAportes);
-                    //ACUM DE VALORES DE APORTES 
-                    let acumAportes = await aportesDB.map(aporteDB=>{return aporteDB.valor})
-                    let acumValores = acumAportes.reduce((a,b)=> a+b,0)
-                    console.log('Valores de aportes', acumValores);
-                    //CONDICIONAL DE < 0
-                    if(existePedido.total - acumValores < 0){    
-                        const inputAporte = {
-                            aportes : idAportes,
-                        }
-                        await Pedido.findOneAndUpdate({_id:id},inputAporte, {new:true})
-                        let pedidoActualizado = await Pedido.findById(id).populate("aportes");
-                        console.log(pedidoActualizado);
-                        //ACTUALIZAR SALDO DE LA BASE DE DATOS 
+                if(aportes !== undefined){
+                    console.log("entra de undefined")
+                    if(aportes.length>0){
+
+                        //VALIDAR APORTE MAYOR DE LA BD
+                            //CONSEGUIR TODOS LOS APORTES PREVIOS
+                            const aportesDB = await Aporte.find({pedido:id});
+                            //Ingreso de aportes en el pedido
+                            let idAportes = [];
+                            idAportes =await aportesDB.map(aporteDB => {return aporteDB._id});
+                            console.log("aportes de id", idAportes);
+    
+                                     
+                            //ACUM DE VALORES DE APORTES 
+                            let acumAportes = await aportesDB.map(aporteDB=>{return aporteDB.valor})
+                            let acumValores = acumAportes.reduce((a,b)=> a+b,0)
+                            console.log('Valores de aportes', acumValores);
+    
+                            console.log("TOTAL", existePedido.total)
+                            //CONDICIONAL DE < 0
+                                //INPUT APORTES ES LO QUE ACABA DE ENVIAR EL USUARIO
+                            if(existePedido.total - (acumValores + input.aportes[0].valor) < 0){ 
+                                
+                                const inputAporte = {
+                                    aportes : idAportes,
+                                }
+                                await Pedido.findOneAndUpdate({_id:id},inputAporte, {new:true})
+                                let pedidoActualizado = await Pedido.findById(id).populate("aportes");
+                                console.log(pedidoActualizado);
+                                //ACTUALIZAR SALDO DE LA BASE DE DATOS 
+                                
+                                return pedidoActualizado;
+                            }else{
+                                
+                                const nuevoAporte = new Aporte({valor:input.aportes[0].valor, pedido : 
+                                    mongoose.Types.ObjectId(id)}); 
+                                //Guardarlo en la base de datos 
+                                await nuevoAporte.save();
+    
+                                const inputAporte = {
+                                    aportes : idAportes,
+                                    saldo : existePedido.total - (acumValores + input.aportes[0].valor)
+                                }
+                                await Pedido.findOneAndUpdate({_id:id},inputAporte, {new:true})
+                                let pedidoActualizado = await Pedido.findById(id).populate("aportes");
+                                console.log("Pedido actualizado ",pedidoActualizado);
+                                //ACTUALIZAR SALDO DE LA BASE DE DATOS 
+                                
+                                return pedidoActualizado;
+                            }
+    
                         
-                        return pedidoActualizado;
-                    }else{
-                        const inputAporte = {
-                            aportes : idAportes,
-                            saldo : existePedido.total - acumValores
-                        }
-                        await Pedido.findOneAndUpdate({_id:id},inputAporte, {new:true})
-                        let pedidoActualizado = await Pedido.findById(id).populate("aportes");
-                        console.log(pedidoActualizado);
-                        //ACTUALIZAR SALDO DE LA BASE DE DATOS 
-                        
-                        return pedidoActualizado;
                     }
-                    
                 }
-                const resultado = await Pedido.findOneAndUpdate({_id:id},input, {new:true}) 
+                const resultado = await Pedido.findOneAndUpdate({_id:mongoose.Types.ObjectId(id)},input, {new:true}).populate("aportes");
+                console.log('resultado de cambio estado', resultado)
                 return resultado;
             } catch (error) {
                 console.log(error)
