@@ -382,12 +382,15 @@ const resolvers = {
             // que se ejecute el code posterior adem'as es async
             for await(const articulo of input.pedido){
                 const {id} =articulo;
-
+                
                 const producto = await Producto.findById(id);
+                console.log("Cantidad de productos a realizar peidod", articulo.cantidad , "existencia del producto", producto.existencia);
                 if(articulo.cantidad > producto.existencia)
                 {
                     throw new Error(`EL artículo ${producto.nombre} excede la cantidad disponible`);
                 }
+                const productoActualizacion = await Producto.findByIdAndUpdate({_id:id},{existencia : producto.existencia-articulo.cantidad},{new:true})
+                console.log("Resultado de actualizacion de existencia", productoActualizacion)
             }
             console.log('después del error ....');
             //Crear un nuevo pedido

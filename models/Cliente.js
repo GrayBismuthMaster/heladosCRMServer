@@ -31,6 +31,10 @@ const ClientesSchema = mongoose.Schema({
         type:Date,
         default: Date.now()
     },
+    direccion : {  
+        type:String,
+        required:false,
+    },
     vendedor: {
         type:mongoose.Schema.Types.ObjectId,
         required:true,

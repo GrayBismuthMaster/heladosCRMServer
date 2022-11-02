@@ -42,8 +42,9 @@ const typeDefs = gql `
         nombre: String!
         apellido: String!
         empresa: String!
-        email: String!
+        email: String
         telefono:String
+        direccion:String
     }
     input PedidoProductoInput {
         id:ID
@@ -89,6 +90,7 @@ const typeDefs = gql `
         empresa: String
         email: String
         telefono:String
+        direccion: String
         vendedor: ID
     }
     type Aporte {
