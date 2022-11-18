@@ -168,7 +168,7 @@ const typeDefs = gql `
         nuevoPedido(input: PedidoInput): Pedido
         actualizarPedido(id:ID!, input: PedidoInput) : Pedido
         eliminarPedido(id:ID!):String
-
+        
         #PSEUDO CHAT PARA NOTIFICACIONES
         addMessage(input: MessageInput!): Message
     }

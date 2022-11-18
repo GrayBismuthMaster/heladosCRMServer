@@ -112,7 +112,6 @@ const resolvers = {
         obtenerPedidosVendedor: async(_,{},ctx) => {
             try {
                 const pedidos = await Pedido.find({vendedor: ctx.usuario.id}).populate('cliente', {
-                    
                 }).populate(('aportes'));
                 console.log(pedidos);
                 return pedidos;
@@ -445,7 +444,7 @@ const resolvers = {
                             console.log("TOTAL", existePedido.total)
                             //CONDICIONAL DE < 0
                                 //INPUT APORTES ES LO QUE ACABA DE ENVIAR EL USUARIO
-                            if(existePedido.total - (acumValores + input.aportes[0].valor) < 0){ 
+                            if(existePedido.total - (acumValores + input.aportes[0].valor) <= 0){ 
                                 
                                 const inputAporte = {
                                     aportes : idAportes,
@@ -461,18 +460,22 @@ const resolvers = {
                                 const nuevoAporte = new Aporte({valor:input.aportes[0].valor, pedido : 
                                     mongoose.Types.ObjectId(id)}); 
                                 //Guardarlo en la base de datos 
-                                await nuevoAporte.save();
-    
+                                let aporteIdNueva = await nuevoAporte.save();
+                                    console.log("ID NUEVA DE APORTE", aporteIdNueva);
+                                    //AFJUNTAR AL ARRAY DE ID DE APORTES 
+                                    idAportes.push(aporteIdNueva);
+
                                 const inputAporte = {
                                     aportes : idAportes,
                                     saldo : existePedido.total - (acumValores + input.aportes[0].valor)
                                 }
-                                await Pedido.findOneAndUpdate({_id:id},inputAporte, {new:true})
-                                let pedidoActualizado = await Pedido.findById(id).populate("aportes");
-                                console.log("Pedido actualizado ",pedidoActualizado);
+                                let resultadoPedido = await Pedido.findOneAndUpdate({_id:id},inputAporte, {new:true}).populate("aportes");
+                                
+                                // let pedidoActualizado = await Pedido.findById(id).populate("aportes");
+                                console.log("Pedido actualizado ",resultadoPedido);
                                 //ACTUALIZAR SALDO DE LA BASE DE DATOS 
                                 
-                                return pedidoActualizado;
+                                return resultadoPedido;
                             }
     
                         
