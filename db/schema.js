@@ -40,8 +40,8 @@ const typeDefs = gql `
     }
     input ClienteInput {
         nombre: String!
-        apellido: String!
-        empresa: String!
+        apellido: String
+        empresa: String
         telefono:String
         direccion:String
     }
@@ -60,6 +60,7 @@ const typeDefs = gql `
         aportes: [AporteInput]
         total: Float
         cliente: ID
+        creado: String
         estado: EstadoPedido
     }
     enum EstadoPedido {
@@ -106,6 +107,7 @@ const typeDefs = gql `
         aportes: [Aporte]
         fecha: String
         saldo: Float
+        creado: String
         estado: EstadoPedido
     }
     type PedidoGrupo{
