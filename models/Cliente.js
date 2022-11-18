@@ -18,8 +18,9 @@ const ClientesSchema = mongoose.Schema({
     },
     telefono: {
         type:String,
-        required: true,
-        trim:true
+        required: false,
+        unique : false,
+        trim:true,
     },
     creado: {
         type:Date,
