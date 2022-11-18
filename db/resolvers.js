@@ -314,7 +314,7 @@ const resolvers = {
             console.log(input)
           
             //Asignar el vendedor
-            cliente = new Cliente(input);
+            let cliente = new Cliente(input);
             try{
                 //Obtener token para guardarlo
                 cliente.vendedor = ctx.usuario.id;
