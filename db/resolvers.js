@@ -312,12 +312,7 @@ const resolvers = {
             console.log(ctx)
             //Verificar si el cliente ya esta registrado
             console.log(input)
-            //Deestructuramos para buscar
-            const {email} = input;
-            let cliente = await Cliente.findOne({email})
-            if (cliente){
-                throw new Error ('Cliente ya creado')
-            }
+          
             //Asignar el vendedor
             cliente = new Cliente(input);
             try{

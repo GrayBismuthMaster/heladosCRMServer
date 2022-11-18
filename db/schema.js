@@ -42,7 +42,6 @@ const typeDefs = gql `
         nombre: String!
         apellido: String!
         empresa: String!
-        email: String
         telefono:String
         direccion:String
     }
@@ -88,7 +87,6 @@ const typeDefs = gql `
         nombre: String
         apellido: String
         empresa: String
-        email: String
         telefono:String
         direccion: String
         vendedor: ID
