@@ -17,13 +17,13 @@ const typeDefs = gql `
         token: String,
     }
     type UsuarioAutenticado {
-        id : ID,
-        nombre : String,
-        email : String
+        id: ID,
+        nombre: String,
+        email: String
     }
     input UsuarioInput {
         nombre: String
-        apellido: String!
+        apellido: String
         email: String!
         password: String!
     }
@@ -33,6 +33,11 @@ const typeDefs = gql `
         password: String!
     }
 
+    input ChangePasswordInput {
+        email: String!
+        oldPassword: String!
+        newPassword: String!
+    }
     input ProductoInput {
         nombre: String!
         existencia: Int!
@@ -158,7 +163,8 @@ const typeDefs = gql `
         #Usuarios
         nuevoUsuario(input: UsuarioInput) : Usuario 
         autenticarUsuario(input: AutenticarInput) : Token
-        
+        editarUsuario(input:ChangePasswordInput) : Usuario
+
         #Clientes
         nuevoCliente(input:ClienteInput) : Cliente
         actualizarCliente(id:ID!,input:ClienteInput):Cliente

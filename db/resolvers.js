@@ -239,6 +239,31 @@ const resolvers = {
             }
 
         },
+        editarUsuario: async (_,{input}) => {
+            const {email, oldPassword, newPassword} = input;
+            //Si el usuario existe
+            const existeUsuario = await Usuario.findOne({email})
+            if(!existeUsuario){
+                throw new Error('El usuario no existe')
+            }
+
+            //Revisar si el password no es correcto
+            const passwordCorrecto = await bcryptjs.compare(oldPassword, existeUsuario.password);
+            if(!passwordCorrecto) {
+                throw new Error('El password es Incorrecto');
+            }
+            //Generar token
+            console.log("usuario de existe")
+            console.log(existeUsuario);
+            let pruebaNewPassword = await bcryptjs.hashSync(newPassword,10);
+            console.log("Password de Usuario nuevo", pruebaNewPassword);
+
+            let usuarioActualizado = await Usuario.findByIdAndUpdate({_id : existeUsuario._id },{email, password : pruebaNewPassword},{new:true})
+            console.log("Usuario actualizado email y password", usuarioActualizado);
+            return {
+                usuario : usuarioActualizado
+            }
+        },
         autenticarUsuario: async (_,{input}) => {
             const {email,password} = input;
             //Si el usuario existe
@@ -444,7 +469,7 @@ const resolvers = {
                             console.log("TOTAL", existePedido.total)
                             //CONDICIONAL DE < 0
                                 //INPUT APORTES ES LO QUE ACABA DE ENVIAR EL USUARIO
-                            if(existePedido.total - (acumValores + input.aportes[0].valor) <= 0){ 
+                            if(existePedido.total - (acumValores + input.aportes[0].valor) < 0){ 
                                 
                                 const inputAporte = {
                                     aportes : idAportes,
